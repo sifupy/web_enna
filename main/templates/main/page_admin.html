@@ -1,0 +1,69 @@
+{% extends 'main\base.html' %}
+{% block content %}
+        <h1 class="text-3xl font-bold mb-4">Bonjour </h1>
+        
+        <p class="text-gray-700">Logged in as: {{ user.matricule }}</p>
+        {% if user.is_admin %}
+        
+        <h2 class="text-2xl font-semibold mb-4">Create Account</h2>
+
+        <form method="POST" class="bg-white p-6 rounded shadow-lg">
+            {% csrf_token %}
+            
+            <!-- Display errors for non-field issues -->
+            {% if form.non_field_errors %}
+                <div class="bg-red-100 text-red-700 p-2 rounded mb-4">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <!-- Field-specific rendering and error handling -->
+            <div class="mb-4">
+                <label class="block text-gray-700" for="matricul">Matricul</label>
+                {{ form.matricul }}  <!-- Field rendering -->
+                {% if form.matricul.errors %}
+                    <span class="text-red-600">{{ form.matricul.errors }}</span>
+                {% endif %}
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700" for="password">Password</label>
+                {{ form.password }}  <!-- Field rendering -->
+                {% if form.password.errors %}
+                    <span class="text-red-600">{{ form.password.errors }}</span>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">Create Account</button>
+        </form>
+        {% else %}
+        <h2>ur a user</h2>
+        <h1>Salut {{agent.prenom}}</h1>
+            <h2 class="text-blue-950 text-xl font-bold">Liste employés:</h2>
+            <table class="table-fixed  border ">
+              <thead class="bg-gray-50  text-gray-700 uppercase">
+                <tr>
+                  <th class="text-left py-4 px-4">Nom</th>
+                  <th class="text-left py-4 px-4">Prenom</th>
+                  <th class="text-left py-4 px-4">Status</th>
+                  <th class="text-left py-4 px-4">date_naissance</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for agent in employees %}
+                <tr class="border-b ">
+                  <td class=" px-4 py-4 uppercase">{{agent.nom}}</td>
+                  <td class="text-gray-500  px-4 py-4 ">{{agent.prenom}}</td>
+                  <td class="text-gray-500  px-4 py-4 ">{{agent.status}}</td>
+                  <td class="text-gray-500  px-4 py-4">{{ agent.date_naissance|date:"Y-m-d" }}</td>
+                  <td class="text-gray-500  px-4 py-4"><a type="button" href="#klkl" class="text-white bg-green-700 hover:bg-green-800 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Attestation</a></td>
+
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            
+
+        {% endif %}
+    
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'main\base.html' %}
+{% load static %}
+{% block content %}
+<section class="bg-no-repeat bg-cover bg-center text-white py-16 px-6 text-center h-3/6" 
+style="background-image: url('{% static 'cov3.jpg' %}')">
+    <h1 class="text-4xl font-bold">Welcome to Employee Document Manager</h1>
+    <p class="mt-4 text-lg">Easily manage, track, and share employee documents.</p>
+    <a href="" class="mt-6 bg-white text-blue-600 py-2 px-4 rounded-full shadow hover:bg-gray-100 transition">Get Started</a>
+</section>
+<div class="container mx-auto py-6 max-w-4xl"> 
+    <h1 class="text-3xl font-bold text-center mb-6">Admin Dashboard</h1>
+    
+    <div class="grid grid-cols-3 gap-6">  
+        
+        <a href="#kksm" class="card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow flex flex-col items-center justify-center">
+            <i class="fas fa-users text-4xl text-blue-500 mb-4"></i>  
+            <h2 class="text-xl font-semibold">Consulter employés</h2>  
+        </a>
+
+        <a href="#kss" class="card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow flex flex-col items-center justify-center">
+            <i class="fas fa-print text-4xl text-green-500 mb-4"></i>
+            <h2 class="text-xl font-semibold">Imprimer document</h2>
+        </a>
+
+        <a href="#jjdjd" class="card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow flex flex-col items-center justify-center">
+            <i class="fas fa-tasks text-4xl text-purple-500 mb-4"></i>
+            <h2 class="text-xl font-semibold">Other Admin Task</h2>
+        </a>
+    </div>
+</div>
+
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+{% endblock %}

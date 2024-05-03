@@ -1,0 +1,42 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    {% tailwind_css %}
+    <title>ENNA</title>
+</head>
+ 
+
+  <body class="bg-gray-200 ">
+    <!-- Side Navigation Bar with Profile Section -->
+    <div class="flex h-screen ">
+        <div class="sidenav bg-gray-800  w-[180px]">
+            <!-- Profile Section -->
+            <div class="mb-0 p-4">
+                <img src="{% static 'profile.png' %}" alt="Profile Picture" class="w-20 h-20 rounded-full mb-2">
+                <h2 class="text-white"> {{agent.nom}} {{agent.prenom}} </h2>
+               
+            </div>
+            <hr class=" border-gray-600 ">
+            <!-- Sidenav Content -->
+            <ul class="p-4">
+                <li class="mb-2"><a href="{% url 'home' %}" class="text-white hover:text-gray-400"><i class="fas fa-home mr-2"></i>Home</a></li>
+                <li class="mb-2"><a href="#hhh" class="text-white hover:text-gray-400"><i class="fas fa-file-alt mr-2"></i>Mes documents</a></li>
+                <li class="mb-2"><a href="#" class="text-white hover:text-gray-400"><i class="fas fa-tools mr-2"></i>Services</a></li>
+                <li class="mb-2"><a href="#" class="text-white hover:text-gray-400"><i class="fas fa-envelope mr-2"></i>Contact</a></li>
+                <li class="mb-2"><a href="#ksks" class="text-red-600 hover:text-gray-400"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a></li>
+
+            </ul>
+        </div>
+        <!-- Main Content -->
+        <div class="flex-grow p-8">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+</body>
+    
+</html>

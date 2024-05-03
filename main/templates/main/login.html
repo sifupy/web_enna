@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Login</title>
+</head>
+<body>
+    <h2>Custom Login</h2>
+    <form method="POST">
+        {% csrf_token %}  <!-- CSRF protection is important -->
+        {{ form.as_p }}  <!-- Render the form fields -->
+        <button type="submit">Login</button>  <!-- Submit button -->
+    </form>
+    {% if form.non_field_errors %}  <!-- Display errors if authentication fails -->
+        <div style="color:red;">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+</body>
+</html>
