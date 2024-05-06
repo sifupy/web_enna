@@ -1,19 +1,44 @@
+{% load static tailwind_tags %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Login</title>
+    {% tailwind_css %}
 </head>
-<body>
-    <h2>Custom Login</h2>
-    <form method="POST">
-        {% csrf_token %}  <!-- CSRF protection is important -->
-        {{ form.as_p }}  <!-- Render the form fields -->
-        <button type="submit">Login</button>  <!-- Submit button -->
-    </form>
-    {% if form.non_field_errors %}  <!-- Display errors if authentication fails -->
-        <div style="color:red;">
-            {{ form.non_field_errors }}
+<body class="bg-gray-300">
+    <div class="w-full h-screen flex justify-center place-items-center">
+        <div class="w-3/5 h-3/5 grid grid-cols-2 rounded-[35px] overflow-hidden">
+            <div class="bg-[#016DAD] flex flex-col justify-center place-items-center ">
+                <h2 class="text-white font-bold text-2xl mb-3 ">ENNA Login</h2>
+                <form method="POST" class="flex flex-col">
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}
+                        <div class="bg-red-100 text-red-700 p-2 rounded mb-4">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+        
+                    <div class="mb-4">
+                        {{ form.matricul }}  
+                        {% if form.matricul.errors %}
+                            <span class="text-red-600">{{ form.matricul.errors }}</span>
+                        {% endif %}
+                    </div>
+        
+                    <div class="mb-4">
+                        {{ form.password }}  
+                        {% if form.password.errors %}
+                            <span class="text-red-600">{{ form.password.errors }}</span>
+                        {% endif %}
+                    </div>
+        
+                    <button type="submit" class="bg-white text-blue-800 font-bold py-2 max-w-20 px-4 rounded-xl place-self-center ">Login </button>
+                </form>
+            </div>
+            <div class="bg-white flex justify-center place-items-center">
+                <img src="{% static 'logo_enna.png'%}" alt="logo_enna">
+            </div>
         </div>
-    {% endif %}
+    </div>
 </body>
 </html>

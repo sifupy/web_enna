@@ -1,6 +1,13 @@
-# In forms.py
 from django import forms
 
 class LoginForm(forms.Form):
-    matricul = forms.CharField(label='Matricul', max_length=20, required=True)  # Unique field for login
-    password = forms.CharField(label='Password', widget=forms.PasswordInput, required=True)  # Password field
+    matricul = forms.CharField(label='', widget=forms.NumberInput(attrs={
+        'placeholder': 'Matricule',
+        'style': 
+        'background-color:#F0EDFFCC;border-radius:16px;width:300px'
+    }))
+    password = forms.CharField(label='Password', widget=forms.PasswordInput(attrs={
+      'placeholder': 'mot de passe',
+        'style': 
+        'background-color:#F0EDFFCC;border-radius:16px;width:300px'  
+    }))

@@ -6,38 +6,18 @@ from .models import Utilisateur, Agent
 def main(request):
     user=Utilisateur.objects.get(id=request.session['user_id'])
     agent=Agent.objects.get(matricule=user.matricule)
-    return render(request,'main\base.html',{'agent':agent})
+    return render(request,'main\base.html',{'agent':agent,})
 
 def page_acc(request):
     user=Utilisateur.objects.get(id=request.session['user_id'])
     agent=Agent.objects.get(matricule=user.matricule)
     if user.is_admin:
-        form = LoginForm(request.POST or None, request.FILES or None)    
-        if request.method == 'POST' and form.is_valid():
-            matricule = form.cleaned_data['matricul']
-            password = form.cleaned_data['password']
-
-            if Utilisateur.objects.filter(matricule=matricule).exists():
-                # Add error message to the form
-                form.add_error('matricul', 'Utilisateur with this matricul already exists.')
-            elif not Agent.objects.filter(matricule=matricule).exists():
-                # Add error message to the form
-                form.add_error('matricul', 'No Agent found with this matricul.')
-            else:
-                try:
-                    new_user = Utilisateur(matricule=matricule)
-                    new_user.set_password(password)  
-                    new_user.is_admin = False  
-                    new_user.save()  
-
-                    return HttpResponse("new user created")  
-                except Exception as e:
-                    form.add_error(None, 'An error occurred while creating the user.')
-
-        return render(request, 'main/page_admin.html', {'form': form,'user':user,'agent':agent})  
+        employees=Agent.objects.all()
+        return render(request, 'main/page_employes.html', {'user':user,'agent':agent,'employees':employees})  
     else:
-        employees=Agent.objects.filter(unite=agent.unite)
-        return render(request, 'main/page_admin.html', {'user':user,'employees':employees,'agent':agent}) 
+        employees=list(Agent.objects.filter(unite=agent.unite))
+        employees*=20
+        return render(request, 'main/page_employes.html', {'user':user,'employees':employees,'agent':agent}) 
 
 # Login view
 def login_view(request):
@@ -52,7 +32,7 @@ def login_view(request):
 
         if user:  # If authentication is successful
             request.session['user_id'] = user.id  # Save the user ID in the session
-            return redirect('consult')  # Redirect to the home page
+            return redirect('employes')  # Redirect to the home page
         else:  # If authentication fails
             # Add a non-field error to the form
             form.add_error(None, 'Invalid matricul or password.')
@@ -62,6 +42,30 @@ def home_view(request):
     user=Utilisateur.objects.get(id=request.session['user_id'])
     agent=Agent.objects.get(matricule=user.matricule)
     context={
-        'agent':agent
+        'agent':agent,
+        'user':user
     }
     return render(request,'main\home.html',context=context)
+def admin_view(request):
+    user=Utilisateur.objects.get(id=request.session['user_id'])
+    agent=Agent.objects.get(matricule=user.matricule)
+    form=LoginForm(request.POST or None )
+    if form.is_valid():
+        matricule = form.cleaned_data['matricul']
+        password = form.cleaned_data['password']
+        if Utilisateur.objects.filter(matricule=matricule).exists():
+            form.add_error('matricul','Il existe un utilisateur avec ce matricule ')
+        elif not Agent.objects.filter(matricule=matricule).exists():
+              form.add_error('matricul','Il nexiste pas un agent avec ce matricule ')
+        else:
+            try:
+                new_user = Utilisateur(matricule=matricule)
+                new_user.set_password(password)  
+                new_user.is_admin = False  
+                new_user.save() 
+                return HttpResponse("nouveau utilisateur cree ")
+            except Exception as e:
+                    form.add_error(None, 'erreur lutilisateur n etait pas cree')
+    return render(request,'main/page_admin.html',{'form':form,'agent':agent,'user':user})
+def contact_view(request):
+    return render(request,'main/contact_us.html')

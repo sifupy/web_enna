@@ -1,0 +1,77 @@
+{% extends 'main\base.html' %}
+{% block employes_active %}active{% endblock %}
+{% block content %}
+        <h1 class="text-3xl font-bold mb-4">Bonjour </h1>
+        
+        <p class="text-gray-700">Logged in as: {{ user.matricule }}</p>
+            <h2 class="text-blue-950 text-xl font-bold">Liste employés:</h2>
+          <script>
+              function searchTable() {
+                  // Get the value from the search input
+                  var input = document.getElementById('searchInput');
+                  var filter = input.value.toUpperCase();
+                  var table = document.getElementById('employeeTable');
+                  var tr = table.getElementsByTagName('tr');
+      
+                  // Loop through all table rows, and hide those that don't match the search query
+                  for (var i = 1; i < tr.length; i++) {
+                      var td = tr[i].getElementsByTagName('td');
+                      var rowContainsSearchTerm = false;
+      
+                      for (var j = 0; j < td.length; j++) {
+                          if (td[j].innerText.toUpperCase().indexOf(filter) > -1) {
+                              rowContainsSearchTerm = true;
+                              break;
+                          }
+                      }
+      
+                      tr[i].style.display = rowContainsSearchTerm ? '' : 'none';
+                  }
+              }
+          </script>
+      
+      
+          <h1>Employee List</h1>
+          <div class="border h-3/5 p-2 max-h-96  ">
+            <label class="relative block mx-5 w-60">
+              <span class="sr-only">Search</span>
+              <span class="absolute inset-y-0 left-0 flex items-center pl-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                </svg>
+                
+              </span>
+              <input class="placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-9 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm" placeholder="Search for anything..." type="text" name="search" id="searchInput"
+              onkeyup="searchTable()"
+/>
+            </label>
+
+        <Div class="max-h-[300px] overflow-auto">
+          <table id="employeeTable" class="table-fixed w-full  ">
+              <thead class=" text-gray-500 sticky top-0 bg-white">
+                <th class="font-normal text-left py-4 px-4">Nom & prenom</th>
+                <th class="font-normal text-left py-4 px-4">Matricule</th>
+                <th class="font-normal text-left py-4 px-4">unité</th>
+                <th class="font-normal text-left py-4 px-4">Status</th>
+                <th class="font-normal text-left py-4 px-4">date_naissance</th>
+              </thead>
+              {% for employee in employees %}
+              <tr class="border-t border-b">
+                  <td class=" px-4 py-4 first-letter:uppercase">{{employee.nom}} {{employee.prenom}}</td>
+                  <td class="text-gray-900  px-4 py-4 ">{{employee.matricule}}</td>
+                  <td class="text-gray-900  px-4 py-4">{{ employee.unite }}</td>
+                  {% if employee.status == "actif" %}
+                  <td class="p-0 "><div class="text-green-600 text-center font-medium bg-gray-100 rounded-md w-28">{{employee.status}}</div></td>
+                  {% else %}
+                  <td class=""><span class="text-red-600 bg-gray-200 rounded-md ">{{employee.status}}</span></td>
+                  {% endif %}
+                  <td class="text-gray-900  px-4 py-4">{{ employee.date_naissance|date:"Y-m-d" }}</td>
+              </tr>
+              {% endfor %}
+          </table>
+        </Div>
+        </div>
+
+        
+    
+{% endblock %}
