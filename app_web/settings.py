@@ -77,7 +77,7 @@ WSGI_APPLICATION = 'app_web.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'mssql',
-        'NAME': 'bdd_enna',
+        'NAME': 'paie_enna',
         'HOST': 'SIFUDES',  
         'PORT': '',               
         'OPTIONS': {

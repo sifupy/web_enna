@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from main.models import Utilisateur
+from main.models import Utilisateur ,Agent
 from django.core.exceptions import ValidationError
 
 class Command(BaseCommand):
@@ -17,11 +17,17 @@ class Command(BaseCommand):
         if Utilisateur.objects.filter(matricule=matricule).exists():
             self.stdout.write(self.style.ERROR(f"User with matricule '{matricule}' already exists"))
             return
+        if not Agent.objects.filter(matricule=matricule).exists():
+            self.stdout.write(self.style.ERROR(f"there is no agent with this amatricule '{matricule}' "))
+            return
 
         try:
+            agent=Agent.objects.get(matricule=matricule)
             admin_user = Utilisateur(matricule=matricule)
             admin_user.set_password(password)  # Hash and set the password
-            admin_user.is_admin = True  # Mark as admin
+            admin_user.is_admin = True
+            admin_user.nom =agent.nom
+            admin_user.prenom = agent.prenom
             admin_user.save()  # Save the new admin user
             self.stdout.write(self.style.SUCCESS(f"Admin user '{matricule}' created successfully"))
         except Exception as e:  # Handle unexpected errors
