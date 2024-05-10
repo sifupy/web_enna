@@ -180,32 +180,61 @@ from django.db import connection
 
 
 
-def ats_view(request,matricule):
-    # Replace 'nom_de_la_procedure' with your stored procedure name
-    procedure_name = 'Getget'
+from django.http import JsonResponse
+from django.shortcuts import render
+from django.db import connection
 
-    # Parameters for the stored procedure (if needed)
+def ats_view(request, matricule):
+    procedure_name = 'releve_emo_p'
     matag = '25923'
     date = '2023-05-08'
-    nbmois = 1
+    nbmois = 12
 
     try:
-        # Execute the stored procedure
         with connection.cursor() as cursor:
-            # Use the execute() method with a raw SQL query
-            cursor.execute(f"EXEC {procedure_name} @matag=25923, @date='2023-05-08', @nbmois=12")
-            # If the stored procedure returns results, you can retrieve them here
-            # For example: results = cursor.fetchall()
+            cursor.execute(
+            """
+            SET NOCOUNT ON
+            DECLARE	@return_value int,
+		@date2 nvarchar(10)
+
+SELECT	@date2 = N'2024-02-15'
+
+EXEC	@return_value = [dbo].[releve_emo_p_mois]
+		@matag = N'25923',
+		@date = N'2023-03-01',
+		@date2 = @date2 OUTPUT
+
+SELECT	@date2 as N'@date2'
+
+SELECT	'Return Value' = @return_value
+
+
+            """,
+            
+        )
             results = cursor.fetchall()
+            columns = [col[0] for col in cursor.description]
+            
+            # Construct a list of dictionaries where each dictionary represents a row
+            data = []
+            for row in results:
+                row_data = {}
+                for col_name, value in zip(columns, row):
+                    row_data[col_name] = value
+                data.append(row_data)
+            
             context = {
-            'results': results,  # Convert to list of dictionaries
-                }
+                'results': data,  # Pass the list of dictionaries as context
+            }
+            
             if not results:
                 return JsonResponse({'error': 'No results found'}, status=404)
-        # JSON response to indicate that the stored procedure was called successfully
-        #return JsonResponse({'message': 'Stored procedure called successfully.'})
-        return render(request,'main/page_ats.html',context=context)
 
+        return render(request, 'main/page_ats.html', context=context)
+    
     except Exception as e:
-        # Handle errors here (e.g., log them)
+        # Handle any exceptions
         return JsonResponse({'error': str(e)}, status=500)
+
+

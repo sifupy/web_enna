@@ -3,10 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>ATS View</title>
 </head>
 <body>
-    <h1>hello</h1>
-    {{results}}
+    <h1>ATS View</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <!-- Display column headers -->
+                {% for column in results.0.keys %}
+                    <th>{{ column }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Iterate over each row in the results -->
+            {% for row in results %}
+                <tr>
+                    <!-- Access data for each column in the current row -->
+                    {% for column, value in row.items %}
+                        <td>{{ value }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </body>
 </html>

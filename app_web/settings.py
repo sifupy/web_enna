@@ -70,7 +70,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'app_web.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
@@ -133,7 +132,7 @@ STATIC_URL = 'static/'
 
 import os  
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-\
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -148,4 +147,4 @@ EMAIL_HOST_PASSWORD = 'qpws ofti lsxv aiyn'  # Your email password or app passwo
 
 # Default "from" email address for sending emails
 DEFAULT_FROM_EMAIL = 'sifoaddar@gmail.com'
-DEVELOPER_EMAIL = 'enzodaidi@gmail.com'
+DEVELOPER_EMAIL = 'cherrarfazil211@gmail.com'
