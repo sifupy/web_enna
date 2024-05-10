@@ -1,46 +1,53 @@
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.shortcuts import render, redirect,get_object_or_404
+from django.http import HttpResponse,HttpResponseRedirect
+from django.urls import reverse_lazy,reverse
 from .forms import LoginForm
 from .auth_backend import CustomAuthenticationBackend
-from .models import Utilisateur, Agent
+from .models import Utilisateur, Agent,Postew,Unite
 from django.core.paginator import Paginator
-from django.db.models import Q  
-def main(request):
-    user=Utilisateur.objects.get(matricule=request.session['user_id'])
-    agent=Agent.objects.get(matricule=user.matricule)
-    return render(request,'main\base.html',{'agent':agent,})
+from django.db.models import Q 
+from django.db import connection 
+from django.core.mail import send_mail
+from django.conf import settings
+
+
 def page_acc(request):
     # Get the logged-in user
+    if not 'user_id' in request.session:
+        return HttpResponseRedirect(reverse('login')) 
     user = Utilisateur.objects.get(matricule=request.session['user_id'])
 
     # Retrieve the search query
-    search_query = request.GET.get("search", "")  # Get the search term from the query parameter
+    search_query = request.GET.get("search", "")
 
-    # Create a Q object to filter by multiple fields
+    # Create a query filter
     query_filter = Q(nom__icontains=search_query) | Q(prenom__icontains=search_query) | Q(matricule__icontains=search_query)
 
-    # Determine the list of employees based on user role
+    # Determine the list of employees
     if user.is_admin:
-        # Admin can search all employees, applying the query filter
         employees = Agent.objects.filter(query_filter)
     else:
-        agent = Agent.objects.get(matricule=user.matricule)  # Fetch the associated Agent
-        # Non-admins can only search within their unit
+        agent = Agent.objects.get(matricule=user.matricule)
         employees = Agent.objects.filter(unite=agent.unite).filter(query_filter)
 
     # Implement pagination with 20 employees per page
-    paginator = Paginator(employees, 20)  # Define the page size
-    page_number = request.GET.get("page", 1)  # Get the current page number
-    page = paginator.get_page(page_number)  # Retrieve the current page
+    paginator = Paginator(employees, 7)
+    page_number = int(request.GET.get("page", 1))  # Convert to integer
+    page = paginator.get_page(page_number)
 
-    # Render the template with the paginated page and search query
+    # Calculate start and end range for pagination
+    start = max(1, page.number - 3)  # Ensure 'start' is at least 1
+    end = min(paginator.num_pages, page.number + 3)  # Ensure 'end' doesn't exceed total pages
+
+    # Render the template with the computed values
     return render(
         request,
         'main/page_employes.html',
         {
             'user': user,
             'page': page,
-            'search_query': search_query,  # Pass the search query to the template
+            'search_query': search_query,
+            'page_range': range(start, end + 1),  # Pass the page range to the template
         }
     )
 # Login view
@@ -55,14 +62,22 @@ def login_view(request):
         user = CustomAuthenticationBackend().authenticate(request, matricule, password)
 
         if user:  # If authentication is successful
-            request.session['user_id'] = user.matricule  # Save the user ID in the session
+            request.session['user_id'] = user.matricule.matricule  # Save the user ID in the session
             return redirect('home')  # Redirect to the home page
         else:  # If authentication fails
             # Add a non-field error to the form
-            form.add_error(None, 'Invalid matricul or password.')
+            form.add_error(None, 'matricule ou mot de passe invalide')
+    return render(request, 'main/login.html', {'form': form}) 
 
-    return render(request, 'main/login.html', {'form': form})  # Render the login template with errors
+
+def logout_view(request):
+    # Manually clear session data to "log out" the user
+    if 'user_id' in request.session:
+        del request.session['user_id']  
+    return HttpResponseRedirect(reverse('login'))  
 def home_view(request):
+    if not 'user_id' in request.session:
+        return HttpResponseRedirect(reverse('login')) 
     user=Utilisateur.objects.get(matricule=request.session['user_id'])
     agent=Agent.objects.get(matricule=user.matricule)
     context={
@@ -71,8 +86,11 @@ def home_view(request):
     }
     return render(request,'main\home.html',context=context)
 def admin_view(request):
+    if not 'user_id' in request.session:
+        return HttpResponseRedirect(reverse('login'))
     user=Utilisateur.objects.get(matricule=request.session['user_id'])
     agent=Agent.objects.get(matricule=user.matricule)
+    utilisateurs=Utilisateur.objects.exclude(matricule=user.matricule)
     form=LoginForm(request.POST or None )
     if form.is_valid():
         matricule = form.cleaned_data['matricul']
@@ -83,21 +101,111 @@ def admin_view(request):
               form.add_error('matricul','Il nexiste pas un agent avec ce matricule ')
         else:
             try:
-                new_user = Utilisateur(matricule=matricule)
+                new_agent=Agent.objects.get(matricule=matricule)
+                new_user = Utilisateur(matricule=new_agent)
+                new_user.nom = new_agent.nom
+                if new_user.nom !=None:
+                    new_user.prenom = new_agent.prenom
+                else:
+                    new_user.prenom = new_agent.nom
                 new_user.set_password(password)  
                 new_user.is_admin = False  
                 new_user.save() 
-                return HttpResponse("nouveau utilisateur cree ")
+                return redirect('page_admin')
             except Exception as e:
                     form.add_error(None, 'erreur lutilisateur n etait pas cree')
-    return render(request,'main/page_admin.html',{'form':form,'agent':agent,'user':user})
+    return render(request,'main/page_admin.html',{'form':form,'agent':agent,'user':user,'utilisateurs':utilisateurs})
+def suprimmer_view(request,matricule):
+    try:
+        ag=get_object_or_404(Agent,matricule=matricule)
+        user=get_object_or_404(Utilisateur,matricule=ag)
+        user.delete()
+        return redirect('page_admin')
+    except Utilisateur.DoesNotExist:
+            return HttpResponse("utilisateur n'existe pas ") 
+
 def contact_view(request):
+    if not 'user_id' in request.session:
+        return HttpResponseRedirect(reverse('login'))
+    if request.method == "POST":
+        name = request.POST.get('Name')  # Retrieve data from the form
+        email = request.POST.get('Email')
+        message = request.POST.get('message')
+
+        if name and email and message:
+            # Send an email with the contact form data
+            subject = f"Contact from {name}"
+            email_message = f"Message from {name} ({email}):\n\n{message}"
+
+            send_mail(
+                subject,
+                email_message,
+                settings.DEFAULT_FROM_EMAIL,
+                [settings.DEVELOPER_EMAIL],  # Developer's email
+            )
+
+            # Redirect to a success page to avoid resubmission
+            return HttpResponse("contact_success")
     return render(request,'main/contact_us.html')
-# from django.db import connection
+def profile_view(request,matricule):
+    if not 'user_id' in request.session:
+        return HttpResponseRedirect(reverse('login'))
+    user=Utilisateur.objects.get(matricule=request.session['user_id'])
+    agent=Agent.objects.get(matricule=matricule)
+    unite=Unite.objects.get(codeuni=agent.unite)
+    poste=Postew.objects.get(codepos=agent.codepw)
+    context={
+        'user':user,
+        'agent':agent,
+        'unite':unite,
+        'poste':poste,
+    }
+    return render(request,'main/page_profile.html',context=context)
+def attestation_view(request,matricule):
+    if not 'user_id' in request.session:
+        return HttpResponseRedirect(reverse('login'))
+    user=Utilisateur.objects.get(matricule=request.session['user_id'])
+    agent=Agent.objects.get(matricule=matricule)
+    post=Postew.objects.get(codepos=agent.codepw)
+    context={
+        'user':user,
+        'agent':agent,
+        'post':post
+    }
+    return render(request,'main/page_attestation.html',context=context)
+from django.db import connection
+from django.http import JsonResponse
 
-# with connection.cursor() as cursor:
-#     # Exécutez la procédure stockée (remplacez le nom de la procédure et les arguments)
-#     cursor.callproc('nom_de_la_procedure', [arg1, arg2, ...])
+from django.db import connection
 
-#     # Récupérez les résultats (si la procédure stockée renvoie des données)
-#     results = cursor.fetchall()
+
+
+def ats_view(request,matricule):
+    # Replace 'nom_de_la_procedure' with your stored procedure name
+    procedure_name = 'Getget'
+
+    # Parameters for the stored procedure (if needed)
+    matag = '25923'
+    date = '2023-05-08'
+    nbmois = 1
+
+    try:
+        # Execute the stored procedure
+        with connection.cursor() as cursor:
+            # Use the execute() method with a raw SQL query
+            cursor.execute(f"EXEC {procedure_name} @matag=25923, @date='2023-05-08', @nbmois=12")
+            # If the stored procedure returns results, you can retrieve them here
+            # For example: results = cursor.fetchall()
+            results = cursor.fetchall()
+            context = {
+            'results': results,  # Convert to list of dictionaries
+                }
+            if not results:
+                return JsonResponse({'error': 'No results found'}, status=404)
+        # JSON response to indicate that the stored procedure was called successfully
+        #return JsonResponse({'message': 'Stored procedure called successfully.'})
+        return render(request,'main/page_ats.html',context=context)
+
+    except Exception as e:
+        # Handle errors here (e.g., log them)
+        return JsonResponse({'error': str(e)}, status=500)

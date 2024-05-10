@@ -23,7 +23,7 @@ class Command(BaseCommand):
 
         try:
             agent=Agent.objects.get(matricule=matricule)
-            admin_user = Utilisateur(matricule=matricule)
+            admin_user = Utilisateur(matricule=agent)
             admin_user.set_password(password)  # Hash and set the password
             admin_user.is_admin = True
             admin_user.nom =agent.nom

@@ -1,15 +1,11 @@
 {% extends 'main/base.html' %}
 {% block employes_active %}active{% endblock %}
 {% block content %}
-    <h1 class="text-3xl font-bold mb-4">Bonjour </h1>
-    <p class="text-gray-700">Logged in as: {{ user.matricule }}</p>
-
     <h2 class="text-blue-950 text-xl font-bold">Employee List:</h2>
-
     <!-- Search Form -->
     <div class="border h-3/5 p-2 max-h-96">
         <form method="GET" action="">
-            <label class="relative block mx-5 w-60">
+            <label class="relative inline-block mx-5 w-64">
                 <span class="sr-only">Search</span>
                 <span class="absolute inset-y-0 left-0 flex items-center pl-2">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
@@ -17,19 +13,19 @@
                     </svg>
                 </span>
                 <input
-                    class="placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-9 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm"
-                    placeholder="Search for anything..."
+                    class="placeholder:italic placeholder:text-slate-400 inline bg-white w-full border border-slate-300 rounded-md py-2 pl-9 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm"
+                    placeholder="rechercher par nom,matricule..."
                     type="text"
                     name="search"
-                    value="{{ search_query }}"  
+                    value="{{ search_query }}"
                 />
             </label>
-            <button type="submit">Search</button>  <!-- Submit the search query to the server -->
+            <button type="submit" class="w-20 h-8 bg-blue-800 rounded-lg text-white font-semibold">Search</button>
         </form>
 
         <!-- Employee Table -->
         <div class="max-h-[300px] overflow-auto">
-            <table id="employeeTable" class="table-fixed w-full">
+            <table class="table-fixed w-full">
                 <thead class="text-gray-500 sticky top-0 bg-white">
                     <tr>
                         <th class="font-normal text-left py-4 px-4">Nom & Prenom</th>
@@ -37,6 +33,7 @@
                         <th class="font-normal text-left py-4 px-4">Unité</th>
                         <th class="font-normal text-left py-4 px-4">Status</th>
                         <th class="font-normal text-left py-4 px-4">Date de Naissance</th>
+                        <th class="font-normal text-left py-4 px-4">Profile</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -44,13 +41,21 @@
                     <tr class="border-t border-b">
                         <td class="px-4 py-4 first-letter:uppercase">{{ employee.nom }} {{ employee.prenom }}</td>
                         <td class="text-gray-900 px-4 py-4">{{ employee.matricule }}</td>
-                        <td class="text-gray-900 px-4 py-4">{{ employee.unite }}</td>
-                        {% if employee.status == "actif" %}
-                        <td class="p-0"><div class="text-green-600 text-center font-medium bg-gray-100 rounded-md w-28">{{ employee.status }}</div></td>
+                        <td class="text-gray-900 px-4 py-4">{{ employee.unite.desuni }}</td>
+                        {% if employee.status.dessita == "EN ACTIVITE" %}
+                        <td class="p-0"><div class="text-green-600 text-center font-medium bg-gray-100 rounded-md w-28">{{ employee.status.dessita }}</div></td>
                         {% else %}
-                        <td class="text-red-600 bg-gray-200 rounded-md">{{ employee.status }}</td>
+                        <td class="p-0"><div class="text-red-600 text-center font-medium bg-gray-100 rounded-md w-28">{{ employee.status.dessita }}</div></td>
                         {% endif %}
                         <td class="text-gray-900 px-4 py-4">{{ employee.date_de_naissance | date:"Y-m-d" }}</td>
+                        <td class="text-gray-900 px-4 py-4">
+                            <a href="{% url 'profile' employee.matricule %}">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 inline">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                  </svg>
+                            </a>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -63,7 +68,7 @@
             <a class="px-2" href="?page={{ page.previous_page_number }}&search={{ search_query }}">Previous</a>
             {% endif %}
 
-            {% for page_num in page.paginator.page_range %}
+            {% for page_num in page_range %}
             <a class="px-2 {% if page.number == page_num %} font-bold {% endif %}" href="?page={{ page_num }}&search={{ search_query }}">{{ page_num }}</a>
             {% endfor %}
 

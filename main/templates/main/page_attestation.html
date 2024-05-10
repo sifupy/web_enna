@@ -1,0 +1,80 @@
+{% load static %}
+{% load static tailwind_tags %}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attestation de Travail</title>
+    {% tailwind_css %}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        .content {
+            font-size: 16px;
+            line-height: 1.6;
+            text-align: justify;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .stamp {
+            display: block;
+            margin: 0 auto;
+            margin-top: 30px; /* Ajuster si nécessaire */
+            width: 150px; /* Ajuster la largeur */
+            height: auto; /* Maintenir le rapport hauteur/largeur */
+        }
+        .print-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">Attestation de Travail</h1>
+            <h2 class="subtitle">Certification de l'Emploi chez L'ENNA </h2>
+        </div>
+        <div class="content">
+            <p>Ceci certifie que <span class="text-gray-950 font-semibold">{{agent.nom}} {{agent.prenom}}</span> est employé(e) par ENNA depuis <span class="text-gray-950 font-semibold">{{agent.dateemb | date:"d-m-Y"}}</span> en tant que <span class="text-gray-950 font-semibold">{{post.despos}} </span>.</p>
+            <p>Cette attestation est délivrée à la demande de l'intéressé(e) pour servir et valoir ce que de droit.</p>
+            
+        </div>
+        <!-- hna ndirou cachet tae admin par exemple  -->
+        <div class="footer">
+            <p>Signature Autorisée par:<span class="text-gray-950 font-semibold">{{user.nom}} {{user.prenom}}</span></p>
+        </div>
+        <button class="print-btn" onclick="window.print()">Print</button>
+    </div>
+</body>
+</html>

@@ -132,14 +132,20 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 import os  
-
-STATIC_URL = '/static/'
-
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+\
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Gmail's SMTP host
+EMAIL_PORT = 587  # Port for TLS
+EMAIL_USE_TLS = True  # Enable TLS for secure connections
+EMAIL_HOST_USER = 'sifeddine.addar@gmail.com'  # Your Gmail address
+EMAIL_HOST_PASSWORD = 'qpws ofti lsxv aiyn'  # Your email password or app password
+
+# Default "from" email address for sending emails
+DEFAULT_FROM_EMAIL = 'sifoaddar@gmail.com'
+DEVELOPER_EMAIL = 'enzodaidi@gmail.com'
