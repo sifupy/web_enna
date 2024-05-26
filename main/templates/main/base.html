@@ -82,7 +82,7 @@
         <div class=" p-8 bg-white w-full h-full">
             <div class="flex justify-between h-10 px-4 mb-12">
                 <div>
-                    <p>page name</p>
+                    <p>{{page_name}}</p>
                 </div>
                 <div>
                     <div class="border overflow-hidden rounded-lg p-2 h-14  bg-gray-50">
@@ -100,7 +100,7 @@
                         
                     </div>
                     <div id="dropdown" class="dropdown-content z-10 bg-gray-50 border rounded-lg hidden m-2">
-                        <a href="{% url 'login' %}" class="text-red-600">logout</a>
+                        <a href="{% url 'logout' %}" class="text-red-600">logout</a>
                       </div>
                 </div>
 

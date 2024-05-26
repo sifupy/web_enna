@@ -10,7 +10,7 @@
     {% tailwind_css %}
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Times New Roman', Times, serif, sans-serif;
             margin: 0;
             padding: 20px;
         }
@@ -23,7 +23,7 @@
             margin-bottom: 20px;
         }
         .title {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: bold;
             margin-bottom: 10px;
         }
@@ -32,13 +32,19 @@
             margin-bottom: 20px;
         }
         .content {
-            font-size: 16px;
-            line-height: 1.6;
+            font-size: 18px;
+            line-height: 1.8;
             text-align: justify;
         }
+        .content p{
+            margin-left:20% ;
+        }
         .footer {
-            margin-top: 20px;
-            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+            margin-top: 40px;
+            padding-right: 140px;
+            text-align: right;
         }
         .stamp {
             display: block;
@@ -59,22 +65,42 @@
         }
     </style>
 </head>
-<body>
-    <div class="container">
+<body class="h-screen">
+    <div class="container" id="document">
         <div class="header">
-            <h1 class="title">Attestation de Travail</h1>
+            <h1 class="title">ATTESTATION DE TRAVAIL</h1>
             <h2 class="subtitle">Certification de l'Emploi chez L'ENNA </h2>
+            <br>
         </div>
-        <div class="content">
-            <p>Ceci certifie que <span class="text-gray-950 font-semibold">{{agent.nom}} {{agent.prenom}}</span> est employé(e) par ENNA depuis <span class="text-gray-950 font-semibold">{{agent.dateemb | date:"d-m-Y"}}</span> en tant que <span class="text-gray-950 font-semibold">{{post.despos}} </span>.</p>
-            <p>Cette attestation est délivrée à la demande de l'intéressé(e) pour servir et valoir ce que de droit.</p>
+        <div class="content flex flex-col w-full ">
+            <p >Je soussigné, Le Directeur Juridique et des Ressources Humaines </p>
+            <p >atteste que {% if agent.sex == "M" %}Monsieur{% else %} Madame {% endif %} {{agent.nom}} {{agent.prenom}} née le {{agent.date_de_naissance | date:"d-m-Y"}} </p>
+            <p > est {% if agent.sex == "M" %}employé{% else %} employée {% endif %} par L'ENNA à titre Permanent depuis le {{agent.dateemb| date:"d-m-Y"}}</p>
+            <p >et occupe actuellement le poste de : <p>
+            <br>
+            <p class="text-gray-950 font-semibold text-center text-xl">{{post.despos}}.</p>
+            <br>
+            <p >Cette attestation lui est délivrée pour servir et valoir ce que de droit.</p>
             
         </div>
         <!-- hna ndirou cachet tae admin par exemple  -->
         <div class="footer">
-            <p>Signature Autorisée par:<span class="text-gray-950 font-semibold">{{user.nom}} {{user.prenom}}</span></p>
+            <u class="font-semibold text-black underline decoration-solid  block">Le Directeur Juridique </u> 
+            <u class="font-semibold text-black underline decoration-solid  ">et des Ressources Humaines</u>
         </div>
-        <button class="print-btn" onclick="window.print()">Print</button>
+        
     </div>
+    <button id="printBtn" class="print-btn " onclick="printDocument()">Print</button>
+
+    <script type="text/javascript">
+        function printDocument() {
+            var printContents = document.getElementById('document').innerHTML;
+            var originalContents = document.body.innerHTML;
+            document.body.innerHTML = printContents;
+            window.print();
+            document.body.innerHTML = originalContents;
+        }
+    </script>
+
 </body>
 </html>

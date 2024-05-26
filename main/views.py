@@ -16,6 +16,8 @@ def page_acc(request):
     if not 'user_id' in request.session:
         return HttpResponseRedirect(reverse('login')) 
     user = Utilisateur.objects.get(matricule=request.session['user_id'])
+    page_name = "Employés"
+
 
     # Retrieve the search query
     search_query = request.GET.get("search", "")
@@ -29,17 +31,13 @@ def page_acc(request):
     else:
         agent = Agent.objects.get(matricule=user.matricule)
         employees = Agent.objects.filter(unite=agent.unite).filter(query_filter)
-
-    # Implement pagination with 20 employees per page
     paginator = Paginator(employees, 7)
     page_number = int(request.GET.get("page", 1))  # Convert to integer
     page = paginator.get_page(page_number)
 
-    # Calculate start and end range for pagination
-    start = max(1, page.number - 3)  # Ensure 'start' is at least 1
-    end = min(paginator.num_pages, page.number + 3)  # Ensure 'end' doesn't exceed total pages
+    start = max(1, page.number - 3) 
+    end = min(paginator.num_pages, page.number + 3)  
 
-    # Render the template with the computed values
     return render(
         request,
         'main/page_employes.html',
@@ -47,7 +45,8 @@ def page_acc(request):
             'user': user,
             'page': page,
             'search_query': search_query,
-            'page_range': range(start, end + 1),  # Pass the page range to the template
+            'page_range': range(start, end + 1), 
+             'page_name': page_name, # Pass the page range to the template
         }
     )
 # Login view
@@ -74,7 +73,7 @@ def logout_view(request):
     # Manually clear session data to "log out" the user
     if 'user_id' in request.session:
         del request.session['user_id']  
-    return HttpResponseRedirect(reverse('login'))  
+        return redirect('page_admin') 
 def home_view(request):
     if not 'user_id' in request.session:
         return HttpResponseRedirect(reverse('login')) 
@@ -86,35 +85,59 @@ def home_view(request):
     }
     return render(request,'main\home.html',context=context)
 def admin_view(request):
-    if not 'user_id' in request.session:
+    if 'user_id' not in request.session:
         return HttpResponseRedirect(reverse('login'))
-    user=Utilisateur.objects.get(matricule=request.session['user_id'])
-    agent=Agent.objects.get(matricule=user.matricule)
-    utilisateurs=Utilisateur.objects.exclude(matricule=user.matricule)
-    form=LoginForm(request.POST or None )
+    
+    user = Utilisateur.objects.get(matricule=request.session['user_id'])
+    agent = Agent.objects.get(matricule=user.matricule)
+    
+    # Filter users, excluding the current user
+    
+    form = LoginForm(request.POST or None)
     if form.is_valid():
         matricule = form.cleaned_data['matricul']
         password = form.cleaned_data['password']
         if Utilisateur.objects.filter(matricule=matricule).exists():
-            form.add_error('matricul','Il existe un utilisateur avec ce matricule ')
+            form.add_error('matricul', 'Il existe un utilisateur avec ce matricule')
         elif not Agent.objects.filter(matricule=matricule).exists():
-              form.add_error('matricul','Il nexiste pas un agent avec ce matricule ')
+            form.add_error('matricul', 'Il n\'existe pas un agent avec ce matricule')
         else:
             try:
-                new_agent=Agent.objects.get(matricule=matricule)
+                new_agent = Agent.objects.get(matricule=matricule)
                 new_user = Utilisateur(matricule=new_agent)
                 new_user.nom = new_agent.nom
-                if new_user.nom !=None:
-                    new_user.prenom = new_agent.prenom
-                else:
-                    new_user.prenom = new_agent.nom
-                new_user.set_password(password)  
-                new_user.is_admin = False  
-                new_user.save() 
+                new_user.prenom = new_agent.prenom if new_agent.prenom else new_agent.nom
+                new_user.set_password(password)
+                new_user.is_admin = False
+                new_user.save()
                 return redirect('page_admin')
             except Exception as e:
-                    form.add_error(None, 'erreur lutilisateur n etait pas cree')
-    return render(request,'main/page_admin.html',{'form':form,'agent':agent,'user':user,'utilisateurs':utilisateurs})
+                form.add_error(None, 'Erreur: l\'utilisateur n\'était pas créé')
+
+    search_query = request.GET.get("search", "")
+    query_filter = Q(nom__icontains=search_query) | Q(prenom__icontains=search_query) 
+    utilisateurs = Utilisateur.objects.filter(matricule__nom__isnull=False).exclude(matricule__nom='')
+
+    utilisateurs = utilisateurs.filter(query_filter)
+
+    paginator = Paginator(utilisateurs,7)
+    page_number = int(request.GET.get("page", 1))
+    page = paginator.get_page(page_number)
+
+    # Calculate the range for pagination control
+    start = max(1, page.number - 1)
+    end = min(paginator.num_pages, page.number + 1)
+    page_range = range(start, end + 1)
+
+    return render(request, 'main/page_admin.html', {
+        'form': form,
+        'agent': agent,
+        'user': user,
+        'page': page,
+        'utilisateurs':utilisateurs,
+        'search_query': search_query,
+        'page_range': page_range,
+    })
 def suprimmer_view(request,matricule):
     try:
         ag=get_object_or_404(Agent,matricule=matricule)
@@ -186,7 +209,7 @@ from django.db import connection
 
 def ats_view(request, matricule):
     procedure_name = 'releve_emo_p'
-    matag = '25923'
+    matag = matricule  # Use the matricule parameter
     date = '2023-05-08'
     nbmois = 12
 
@@ -194,26 +217,14 @@ def ats_view(request, matricule):
         with connection.cursor() as cursor:
             cursor.execute(
             """
-            SET NOCOUNT ON
-            DECLARE	@return_value int,
-		@date2 nvarchar(10)
+            SET NOCOUNT ON; 
 
-SELECT	@date2 = N'2024-02-15'
-
-EXEC	@return_value = [dbo].[releve_emo_p_mois]
-		@matag = N'25923',
-		@date = N'2023-03-01',
-		@date2 = @date2 OUTPUT
-
-SELECT	@date2 as N'@date2'
-
-SELECT	'Return Value' = @return_value
-
-
-            """,
+            exec [dbo].[releve_emo_p_mois] 25923,'2023-02-01','2024-02-15'
             
-        )
+            """,
+            )
             results = cursor.fetchall()
+            
             columns = [col[0] for col in cursor.description]
             
             # Construct a list of dictionaries where each dictionary represents a row
@@ -236,5 +247,3 @@ SELECT	'Return Value' = @return_value
     except Exception as e:
         # Handle any exceptions
         return JsonResponse({'error': str(e)}, status=500)
-
-
