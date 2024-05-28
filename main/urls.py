@@ -7,9 +7,10 @@ urlpatterns = [
     path('',home_view,name="home"),
     path('employes/',page_acc,name="employes"),
     path('page_admin/',admin_view,name="page_admin"),
-    path('ats/<matricule>',ats_view,name="ats"),
+    path('relve_emo/<int:matricule>/<str:date_debut>/<str:date_fin>/',relve_emo_view, name='relve_emo'),
     path('profile/<matricule>',profile_view,name="profile"),
     path('attestation/<matricule>',attestation_view,name="attestation"),
     path('suprimmer_user/<matricule>',suprimmer_view,name="suprimmer_user"),
     path('contact_us/',contact_view,name="contact_us"),
+    path('documents/',document_view,name="documents"),
 ]

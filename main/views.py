@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect,get_object_or_404
 from django.http import HttpResponse,HttpResponseRedirect
 from django.urls import reverse_lazy,reverse
-from .forms import LoginForm
+from .forms import *
 from .auth_backend import CustomAuthenticationBackend
 from .models import Utilisateur, Agent,Postew,Unite
 from django.core.paginator import Paginator
@@ -46,7 +46,7 @@ def page_acc(request):
             'page': page,
             'search_query': search_query,
             'page_range': range(start, end + 1), 
-             'page_name': page_name, # Pass the page range to the template
+            'page_name': page_name, # Pass the page range to the template
         }
     )
 # Login view
@@ -79,9 +79,14 @@ def home_view(request):
         return HttpResponseRedirect(reverse('login')) 
     user=Utilisateur.objects.get(matricule=request.session['user_id'])
     agent=Agent.objects.get(matricule=user.matricule)
+    page_name = "Bienvenue dans la Gestion des Documents des Employés"
+    page_name2 = "Gérez, suivez et partagez facilement les documents des employés."
     context={
         'agent':agent,
-        'user':user
+        'user':user,
+        'page_name':page_name,
+        'page_name2':page_name2,
+        
     }
     return render(request,'main\home.html',context=context)
 def admin_view(request):
@@ -207,21 +212,17 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.db import connection
 
-def ats_view(request, matricule):
-    procedure_name = 'releve_emo_p'
-    matag = matricule  # Use the matricule parameter
-    date = '2023-05-08'
-    nbmois = 12
-
+def relve_emo_view(request, matricule, date_debut,date_fin ):
     try:
         with connection.cursor() as cursor:
             cursor.execute(
             """
             SET NOCOUNT ON; 
 
-            exec [dbo].[releve_emo_p_mois] 25923,'2023-02-01','2024-02-15'
+            exec [dbo].[releve_emo_p_mois] %s, %s, %s
             
             """,
+            (matricule, date_debut, date_fin)
             )
             results = cursor.fetchall()
             
@@ -247,3 +248,37 @@ def ats_view(request, matricule):
     except Exception as e:
         # Handle any exceptions
         return JsonResponse({'error': str(e)}, status=500)
+
+def document_view(request):
+    user = Utilisateur.objects.get(matricule=request.session['user_id'])
+    agent = Agent.objects.get(matricule=user.matricule)
+
+    if request.method == 'POST':
+        form_rel = relve_Form(request.POST)
+        form_attes = attestation_Form(request.POST)
+        form_ats = ats_Form(request.POST)
+
+        if form_rel.is_valid():
+            cleaned_data = form_rel.cleaned_data
+            return redirect('relve_emo', matricule=cleaned_data['matricule'], date_debut=cleaned_data['date_debut'], date_fin=cleaned_data['date_fin'])
+
+        elif form_attes.is_valid():
+            cleaned_data = form_attes.cleaned_data
+            return redirect('attestation', matricule=cleaned_data['matricule'])
+
+        elif form_ats.is_valid():
+            cleaned_data = form_ats.cleaned_data
+            return redirect('ats_view', matricule=cleaned_data['matricule'], date=cleaned_data['date_debut'], nbr_mois=cleaned_data['nbr_mois'])
+    else:
+        form_rel = relve_Form()
+        form_attes = attestation_Form()
+        form_ats = ats_Form()
+
+    context = {
+        'user': user,
+        'agent': agent,
+        'form_rel': form_rel,
+        'form_ats': form_ats,
+        'form_attes': form_attes,
+    }
+    return render(request, 'main/documents.html', context=context)

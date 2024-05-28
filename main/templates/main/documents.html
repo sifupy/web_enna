@@ -1,0 +1,33 @@
+{% extends 'main/base.html' %}
+
+{% block documents_active %} active {% endblock %}
+{% block content %}
+<div class="h-screen border">
+    <div class="grid grid-cols-3 gap-4 p-4">
+        <div class="card min-h-80 max-h-96 shadow-sm border rounded-lg bg-white text-black p-4">
+            <h1 class="text-xl font-bold">Relvé emoluments</h1>
+            <form method="post" class="flex flex-col justify-center">
+                {% csrf_token %}
+                {{ form_rel.as_p }}
+                <button type="submit" class="bg-blue-800 text-white font-semibold  my-4 py-2 px-4 rounded hover:bg-blue-900 ">Générer</button>
+            </form>
+        </div>
+        <div class="card min-h-80 max-h-96  border shadow-sm rounded-lg bg-white text-black p-4">
+            <h1 class="text-xl font-bold">Attestation employé</h1>
+            <form method="post" class="flex flex-col justify-between h-[91%]">
+                {% csrf_token %}
+                {{ form_attes.as_p }}
+                <button type="submit" class="bg-blue-800 text-white font-semibold my-4 py-2 px-4 rounded hover:bg-blue-900 ">Générer</button>
+            </form>
+        </div>
+        <div class="card min-h-80 max-h-96  shadow-sm border rounded-lg bg-white text-black p-4 ">
+            <h1 class="text-xl font-bold">document ats</h1>
+            <form method="post" class="flex flex-col justify-center">
+                {% csrf_token %}
+                {{ form_ats.as_p }}
+                <button type="submit" class="bg-blue-800 text-white font-semibold  py-2 my-4 px-4 rounded hover:bg-blue-900 ">Générer</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
