@@ -12,39 +12,34 @@ class LoginForm(forms.Form):
         'background-color:#F0EDFFCC;border-radius:16px;width:300px'  
     }))
 class relve_Form(forms.Form):
-    matricule = forms.IntegerField(widget=forms.NumberInput(attrs={
+    matricule1 = forms.IntegerField(widget=forms.NumberInput(attrs={
         'class': 'form-input mt-1 block w-full border-gray-300 rounded-md',
         'placeholder': 'Matricule'
-    }))
+    }),label="Matricule")
     date_debut = forms.DateField(widget=forms.DateInput(attrs={
         'type': 'date',
         'class': 'form-input mt-1 block w-full border-gray-300 rounded-md',
         'placeholder': 'Date Début'
-    }), label="Date Début")
-    date_fin = forms.DateField(widget=forms.DateInput(attrs={
-        'type': 'date',
-        'class': 'form-input mt-1 block w-full border-gray-300 rounded-md',
-        'placeholder': 'Date Fin'
-    }), label="Date Fin")
+    }), label="Date ")
+  
 
 class ats_Form(forms.Form):
-    matricule = forms.IntegerField(widget=forms.NumberInput(attrs={
+    matricule2 = forms.IntegerField(widget=forms.NumberInput(attrs={
         'class': 'form-input mt-1 block w-full border-gray-300 rounded-md',
         'placeholder': 'Matricule'
-    }))
-    date_debut = forms.DateField(widget=forms.DateInput(attrs={
+    }),label="Matricule")
+    date= forms.DateField(widget=forms.DateInput(attrs={
         'type': 'date',
         'class': 'form-input mt-1 block w-full border-gray-300 rounded-md',
         'placeholder': 'Date Début'
-    }), label="Date Début")
-    date_fin = forms.DateField(widget=forms.DateInput(attrs={
-        'type': 'date',
+    }), label="Date ")
+    nbrmois = forms.IntegerField(widget=forms.NumberInput(attrs={
         'class': 'form-input mt-1 block w-full border-gray-300 rounded-md',
-        'placeholder': 'Date Fin'
-    }), label="Date Fin")
+        'placeholder': 'Nombre mois'
+    }))
 
 class attestation_Form(forms.Form):
-    matricule = forms.IntegerField(widget=forms.NumberInput(attrs={
+    matricule3 = forms.IntegerField(widget=forms.NumberInput(attrs={
         'class': 'form-input mt-1 block w-full border-gray-300 rounded-md',
         'placeholder': 'Matricule'
-    }))
+    }),label="Matricule")

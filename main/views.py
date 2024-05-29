@@ -3,7 +3,7 @@ from django.http import HttpResponse,HttpResponseRedirect
 from django.urls import reverse_lazy,reverse
 from .forms import *
 from .auth_backend import CustomAuthenticationBackend
-from .models import Utilisateur, Agent,Postew,Unite
+from .models import Utilisateur, Agent,Postew,Unite,HistAgent
 from django.core.paginator import Paginator
 from django.db.models import Q 
 from django.db import connection 
@@ -175,20 +175,67 @@ def contact_view(request):
             # Redirect to a success page to avoid resubmission
             return HttpResponse("contact_success")
     return render(request,'main/contact_us.html')
-def profile_view(request,matricule):
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from .models import Utilisateur, Agent, Unite, Postew, HistAgent
+
+def profile_view(request, matricule):
     if not 'user_id' in request.session:
         return HttpResponseRedirect(reverse('login'))
-    user=Utilisateur.objects.get(matricule=request.session['user_id'])
-    agent=Agent.objects.get(matricule=matricule)
-    unite=Unite.objects.get(codeuni=agent.unite)
-    poste=Postew.objects.get(codepos=agent.codepw)
-    context={
-        'user':user,
-        'agent':agent,
-        'unite':unite,
-        'poste':poste,
+    
+    user = get_object_or_404(Utilisateur, matricule=request.session['user_id'])
+    agent = get_object_or_404(Agent, matricule=matricule)
+    unite = get_object_or_404(Unite, codeuni=agent.unite)
+    poste = get_object_or_404(Postew, codepos=agent.codepw)
+    hist = HistAgent.objects.filter(matricule=matricule).order_by('exercice', 'mois')
+    
+    grouped_hist = group_histories(hist)
+    
+    context = {
+        'user': user,
+        'agent': agent,
+        'unite': unite,
+        'poste': poste,
+        'hist': grouped_hist,
     }
-    return render(request,'main/page_profile.html',context=context)
+    return render(request, 'main/page_profile.html', context=context)
+
+def group_histories(histories):
+    grouped_hist = []
+    if not histories:
+        return grouped_hist
+    
+    current_group = {
+        'start': (int(histories[0].exercice), int(histories[0].mois)),
+        'end': (int(histories[0].exercice), int(histories[0].mois)),
+        'status': histories[0].statut,
+        'details': [histories[0]],
+    }
+    
+    for i in range(1, len(histories)):
+        current = histories[i]
+        previous = histories[i - 1]
+        
+        if current.sitadmin == previous.sitadmin and (
+            (int(current.exercice) == int(previous.exercice) and int(current.mois) == int(previous.mois) + 1) or
+            (int(current.exercice) == int(previous.exercice) + 1 and int(current.mois) == 1 and int(previous.mois) == 12)
+        ):
+            current_group['end'] = (int(current.exercice), int(current.mois))
+            current_group['details'].append(current)
+        else:
+            grouped_hist.append(current_group)
+            current_group = {
+                'start': (int(current.exercice), int(current.mois)),
+                'end': (int(current.exercice), int(current.mois)),
+                'status': current.statut,
+                'details': [current],
+            }
+    
+    grouped_hist.append(current_group)
+    
+    return grouped_hist
+
 def attestation_view(request,matricule):
     if not 'user_id' in request.session:
         return HttpResponseRedirect(reverse('login'))
@@ -212,17 +259,19 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.db import connection
 
-def relve_emo_view(request, matricule, date_debut,date_fin ):
+def relve_emo_view(request, matricule, date_debut ):
+    if 'user_id' not in request.session:
+        return HttpResponseRedirect(reverse('login'))
     try:
         with connection.cursor() as cursor:
             cursor.execute(
             """
             SET NOCOUNT ON; 
 
-            exec [dbo].[releve_emo_p_mois] %s, %s, %s
+            exec [dbo].[releve_emo_p_mois] %s, %s,%s
             
             """,
-            (matricule, date_debut, date_fin)
+            (matricule, date_debut,date_debut)
             )
             results = cursor.fetchall()
             
@@ -243,13 +292,15 @@ def relve_emo_view(request, matricule, date_debut,date_fin ):
             if not results:
                 return JsonResponse({'error': 'No results found'}, status=404)
 
-        return render(request, 'main/page_ats.html', context=context)
+        return render(request, 'main/page_relve.html', context=context)
     
     except Exception as e:
         # Handle any exceptions
         return JsonResponse({'error': str(e)}, status=500)
 
 def document_view(request):
+    if 'user_id' not in request.session:
+        return HttpResponseRedirect(reverse('login'))
     user = Utilisateur.objects.get(matricule=request.session['user_id'])
     agent = Agent.objects.get(matricule=user.matricule)
 
@@ -260,15 +311,22 @@ def document_view(request):
 
         if form_rel.is_valid():
             cleaned_data = form_rel.cleaned_data
-            return redirect('relve_emo', matricule=cleaned_data['matricule'], date_debut=cleaned_data['date_debut'], date_fin=cleaned_data['date_fin'])
+            if Agent.objects.filter(matricule=cleaned_data['matricule1']).exists():
+                return redirect('relve_emo', matricule=cleaned_data['matricule1'], date_debut=cleaned_data['date_debut'])
+            else:
+                form_rel.add_error('matricule1', 'Il n\'existe pas un agent avec ce matricule')
+        elif form_ats.is_valid():
+            cleaned_data = form_ats.cleaned_data
+            if Agent.objects.filter(matricule=cleaned_data['matricule2']).exists():
+                return redirect('ats_per', matricule=cleaned_data['matricule2'], date=cleaned_data['date'], nbrmois=cleaned_data['nbrmois'])
+            else:
+                form_ats.add_error('matricule2', 'Il n\'existe pas un agent avec ce matricule')
 
         elif form_attes.is_valid():
             cleaned_data = form_attes.cleaned_data
-            return redirect('attestation', matricule=cleaned_data['matricule'])
+            return redirect('attestation', matricule=cleaned_data['matricule3'])
 
-        elif form_ats.is_valid():
-            cleaned_data = form_ats.cleaned_data
-            return redirect('ats_view', matricule=cleaned_data['matricule'], date=cleaned_data['date_debut'], nbr_mois=cleaned_data['nbr_mois'])
+        
     else:
         form_rel = relve_Form()
         form_attes = attestation_Form()
@@ -282,3 +340,57 @@ def document_view(request):
         'form_attes': form_attes,
     }
     return render(request, 'main/documents.html', context=context)
+def ats_per_view(request, matricule, date, nbrmois):
+    if 'user_id' not in request.session:
+        return HttpResponseRedirect(reverse('login'))
+    try:
+        with connection.cursor() as cursor:
+            query = f"""
+            SET NOCOUNT ON; 
+            DECLARE @return_value int
+
+            EXEC @return_value = [dbo].[ats_periode_60_nb]
+                @matag = N'{matricule}',
+                @date = '{date}',
+                @nb_mois = {nbrmois}
+
+            SELECT 'Return Value' = @return_value
+            """
+            cursor.execute(query)
+            results = cursor.fetchall()
+
+            columns = [col[0] for col in cursor.description]
+
+            # Exclude 'matag' and 'mois' columns
+            display_columns = [col for col in columns if not (col.startswith('matag') or col.startswith('mois'))]
+
+            # Calculate sums for each base column
+            base_columns = [col for col in display_columns if col.startswith('base')]
+            sums = {base: 0 for base in base_columns}
+            data = []
+            for row in results:
+                row_data = {col_name: value for col_name, value in zip(columns, row)}
+                data.append(row_data)
+                for base in base_columns:
+                    sums[base] += float(row_data[base])
+
+            # Calculate total sum and average
+            total_sum = sum(sums.values())
+            average_sum = total_sum / nbrmois if nbrmois else 0
+
+            context = {
+                'results': data,
+                'sums': sums,
+                'display_columns': display_columns,  # Pass only the display columns to the template
+                'total_sum': total_sum,
+                'average_sum': average_sum,
+                'nbrmois':nbrmois,
+
+            }
+
+            if not results:
+                return JsonResponse({'error': 'No results found'}, status=404)
+
+        return render(request, 'main/page_ats.html', context=context)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

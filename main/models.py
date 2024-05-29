@@ -176,3 +176,39 @@ class Postew(models.Model):
     class Meta:
         managed = False
         db_table = 'POSTEW'
+
+
+class HistAgent(models.Model):
+    mois = models.CharField(db_column='MOIS', max_length=2, blank=True, null=True)  # Field name made lowercase.
+    exercice = models.CharField(db_column='EXERCICE', max_length=4, blank=True, null=True)  # Field name made lowercase.
+    matricule = models.CharField(db_column='MATAG', max_length=5,primary_key=True)  # Field name made lowercase.
+    modepaie = models.CharField(db_column='MODEPAIE', max_length=1, blank=True, null=True)  # Field name made lowercase.
+    numcompte = models.CharField(db_column='NUMCOMPTE', max_length=25, blank=True, null=True)  # Field name made lowercase.
+    sitfam = models.CharField(db_column='SITFAM', max_length=1, blank=True, null=True)  # Field name made lowercase.
+    nbenf = models.IntegerField(db_column='NBENF', blank=True, null=True)  # Field name made lowercase.
+    statut = models.CharField(db_column='STATUT', max_length=1, blank=True, null=True)  # Field name made lowercase.
+    sitadmin = models.CharField(db_column='SITADMIN', max_length=3, blank=True, null=True)  # Field name made lowercase.
+    datesita = models.DateTimeField(db_column='DATESITA', blank=True, null=True)  # Field name made lowercase.
+    codepwn = models.CharField(db_column='CODEPWN', max_length=6, blank=True, null=True)  # Field name made lowercase.
+    code_prof = models.CharField(db_column='CODE_PROF', max_length=2, blank=True, null=True)  # Field name made lowercase.
+    typecais = models.CharField(db_column='TYPECAIS', max_length=2, blank=True, null=True)  # Field name made lowercase.
+    nbj = models.FloatField(db_column='NBJ', blank=True, null=True)  # Field name made lowercase.
+    cat = models.CharField(db_column='CAT', max_length=2, blank=True, null=True)  # Field name made lowercase.
+    sec = models.IntegerField(db_column='SEC', blank=True, null=True)  # Field name made lowercase.
+    sb = models.DecimalField(db_column='SB', max_digits=18, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
+    saluniq = models.BooleanField(db_column='SALUNIQ', blank=True, null=True)  # Field name made lowercase.
+    codemutag = models.BooleanField(db_column='CODEMUTAG', blank=True, null=True)  # Field name made lowercase.
+    nummutag = models.CharField(db_column='NUMMUTAG', max_length=8, blank=True, null=True)  # Field name made lowercase.
+    codecapdec = models.BooleanField(db_column='CODECAPDEC', blank=True, null=True)  # Field name made lowercase.
+    compchir = models.BooleanField(db_column='COMPCHIR', blank=True, null=True)  # Field name made lowercase.
+    transveh = models.CharField(db_column='TRANSVEH', max_length=1, blank=True, null=True)  # Field name made lowercase.
+    type_c = models.CharField(max_length=1, blank=True, null=True)
+    profession = models.CharField(db_column='PROFESSION', max_length=70, blank=True, null=True)  # Field name made lowercase.
+    codeunia = models.CharField(db_column='CODEUNIA', max_length=4, blank=True, null=True)  # Field name made lowercase.
+    code_dir = models.CharField(max_length=1, blank=True, null=True)
+    abbat_irg = models.BooleanField(db_column='ABBAT_IRG', blank=True, null=True)  # Field name made lowercase.
+    handic = models.BooleanField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'HIST_AGENT'

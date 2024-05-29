@@ -23,8 +23,8 @@ style="background-image: url('{% static 'cover1.jpg' %}')">
         </a>
         {% if user.is_admin %}
         <a href="{% url 'page_admin' %}" class="card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow flex flex-col items-center justify-center">
-            <i class="fas fa-tasks text-4xl text-purple-500 mb-4"></i>
-            <h2 class="text-xl font-semibold">Page admin</h2>
+            <i class="fas fa-users text-4xl text-purple-500 mb-4"></i>
+            <h2 class="text-xl font-semibold">Utilisateurs</h2>
         </a>
         {% else %}
         <a href="#jjdjd" class="card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow flex flex-col items-center justify-center">
