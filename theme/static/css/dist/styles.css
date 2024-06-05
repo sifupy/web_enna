@@ -795,6 +795,10 @@ select {
   border-width: 0;
 }
 
+.visible {
+  visibility: visible;
+}
+
 .static {
   position: static;
 }
@@ -944,10 +948,6 @@ select {
   margin-top: 1rem;
 }
 
-.mt-\[-30px\] {
-  margin-top: -30px;
-}
-
 .block {
   display: block;
 }
@@ -1016,6 +1016,10 @@ select {
   height: 300px;
 }
 
+.h-\[500px\] {
+  height: 500px;
+}
+
 .h-\[50px\] {
   height: 50px;
 }
@@ -1040,8 +1044,8 @@ select {
   max-height: 24rem;
 }
 
-.max-h-\[300px\] {
-  max-height: 300px;
+.max-h-\[400px\] {
+  max-height: 400px;
 }
 
 .min-h-80 {
@@ -1060,16 +1064,8 @@ select {
   width: 50%;
 }
 
-.w-20 {
-  width: 5rem;
-}
-
 .w-28 {
   width: 7rem;
-}
-
-.w-3\/4 {
-  width: 75%;
 }
 
 .w-3\/5 {
@@ -1078,6 +1074,10 @@ select {
 
 .w-4 {
   width: 1rem;
+}
+
+.w-4\/5 {
+  width: 80%;
 }
 
 .w-6 {
@@ -1111,6 +1111,10 @@ select {
 
 .w-screen {
   width: 100vw;
+}
+
+.min-w-full {
+  min-width: 100%;
 }
 
 .max-w-20 {
@@ -1196,6 +1200,10 @@ select {
 
 .overflow-hidden {
   overflow: hidden;
+}
+
+.overflow-x-auto {
+  overflow-x: auto;
 }
 
 .rounded {
@@ -1386,6 +1394,11 @@ select {
   padding-bottom: 1.5rem;
 }
 
+.py-8 {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
 .pl-10 {
   padding-left: 2.5rem;
 }
@@ -1474,13 +1487,12 @@ select {
   line-height: 1.75rem;
 }
 
-.text-xs {
-  font-size: 0.75rem;
-  line-height: 1rem;
-}
-
 .font-bold {
   font-weight: 700;
+}
+
+.font-extrabold {
+  font-weight: 800;
 }
 
 .font-medium {
@@ -1493,10 +1505,6 @@ select {
 
 .font-semibold {
   font-weight: 600;
-}
-
-.font-extrabold {
-  font-weight: 800;
 }
 
 .leading-7 {
@@ -1534,11 +1542,6 @@ select {
 .text-blue-950 {
   --tw-text-opacity: 1;
   color: rgb(23 37 84 / var(--tw-text-opacity));
-}
-
-.text-gray-200 {
-  --tw-text-opacity: 1;
-  color: rgb(229 231 235 / var(--tw-text-opacity));
 }
 
 .text-gray-500 {
@@ -1579,6 +1582,11 @@ select {
 .text-purple-500 {
   --tw-text-opacity: 1;
   color: rgb(168 85 247 / var(--tw-text-opacity));
+}
+
+.text-red-500 {
+  --tw-text-opacity: 1;
+  color: rgb(239 68 68 / var(--tw-text-opacity));
 }
 
 .text-red-600 {
@@ -1661,6 +1669,11 @@ select {
 .hover\:bg-blue-900:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(30 58 138 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-gray-100:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(243 244 246 / var(--tw-bg-opacity));
 }
 
 .hover\:text-gray-400:hover {

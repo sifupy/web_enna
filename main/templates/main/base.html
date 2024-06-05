@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">   
+    <link rel="icon" type="image/x-icon" href="{% static 'logo_2.png' %}">
     {% tailwind_css %}
     <title>ENNA</title>
     <style>
@@ -102,7 +103,12 @@
                         
                     </div>
                     <div id="dropdown" class="dropdown-content z-10 bg-gray-50 border rounded-lg hidden m-2">
-                        <a href="{% url 'logout' %}" class="text-red-600">logout</a>
+                        <a href="{% url 'logout' %}" class="text-red-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-6 inline-block">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
+                              </svg>
+                              
+                            logout</a>
                       </div>
                 </div>
 

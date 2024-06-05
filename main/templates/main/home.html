@@ -17,7 +17,7 @@ style="background-image: url('{% static 'cover1.jpg' %}')">
             <h2 class="text-xl font-semibold">Consulter employés</h2>  
         </a>
 
-        <a href="#kss" class="card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow flex flex-col items-center justify-center">
+        <a href="{% url 'documents' %}" class="card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow flex flex-col items-center justify-center">
             <i class="fas fa-print text-4xl text-green-500 mb-4"></i>
             <h2 class="text-xl font-semibold">Imprimer document</h2>
         </a>
@@ -27,9 +27,9 @@ style="background-image: url('{% static 'cover1.jpg' %}')">
             <h2 class="text-xl font-semibold">Utilisateurs</h2>
         </a>
         {% else %}
-        <a href="#jjdjd" class="card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow flex flex-col items-center justify-center">
-            <i class="fas fa-tasks text-4xl text-purple-500 mb-4"></i>
-            <h2 class="text-xl font-semibold">Other Admin Task</h2>
+        <a href="{% url 'contact_us' %}" class="card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow flex flex-col items-center justify-center">
+            <i class="fas fa-envelope text-4xl text-purple-500 mb-4"></i>
+            <h2 class="text-xl font-semibold ">Contactez nous</h2>
         </a>
         {% endif %}
     </div>

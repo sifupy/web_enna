@@ -31,7 +31,7 @@ def page_acc(request):
     else:
         agent = Agent.objects.get(matricule=user.matricule)
         employees = Agent.objects.filter(unite=agent.unite).filter(query_filter)
-    paginator = Paginator(employees, 7)
+    paginator = Paginator(employees, 5)
     page_number = int(request.GET.get("page", 1))  # Convert to integer
     page = paginator.get_page(page_number)
 
@@ -104,8 +104,10 @@ def admin_view(request):
         password = form.cleaned_data['password']
         if Utilisateur.objects.filter(matricule=matricule).exists():
             form.add_error('matricul', 'Il existe un utilisateur avec ce matricule')
+            return HttpResponse("Il existe un utilisateur avec ce matricule")
         elif not Agent.objects.filter(matricule=matricule).exists():
             form.add_error('matricul', 'Il n\'existe pas un agent avec ce matricule')
+            return HttpResponse("Il n\'existe pas un agent avec ce matricule")
         else:
             try:
                 new_agent = Agent.objects.get(matricule=matricule)
@@ -258,11 +260,18 @@ from django.db import connection
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.db import connection
+from dateutil.relativedelta import relativedelta
+from datetime import datetime
 
 def relve_emo_view(request, matricule, date_debut ):
     if 'user_id' not in request.session:
         return HttpResponseRedirect(reverse('login'))
     try:
+        agent=Agent.objects.get(matricule=matricule)
+        post=Postew.objects.get(codepos=agent.codepw)
+        if isinstance(date_debut, str):
+            date_f = datetime.strptime(date_debut, '%Y-%m-%d')
+        date_1 = date_f - relativedelta(months=11)
         with connection.cursor() as cursor:
             cursor.execute(
             """
@@ -277,7 +286,7 @@ def relve_emo_view(request, matricule, date_debut ):
             
             columns = [col[0] for col in cursor.description]
             
-            # Construct a list of dictionaries where each dictionary represents a row
+           
             data = []
             for row in results:
                 row_data = {}
@@ -286,7 +295,12 @@ def relve_emo_view(request, matricule, date_debut ):
                 data.append(row_data)
             
             context = {
-                'results': data,  # Pass the list of dictionaries as context
+                'results': data,
+                  'agent':agent,
+                  'post':post,
+                  'date_d':date_1,
+                  'date_f':date_f
+                     
             }
             
             if not results:
@@ -368,6 +382,7 @@ def ats_per_view(request, matricule, date, nbrmois):
             base_columns = [col for col in display_columns if col.startswith('base')]
             sums = {base: 0 for base in base_columns}
             data = []
+            agent=Agent.objects.get(matricule=matricule)
             for row in results:
                 row_data = {col_name: value for col_name, value in zip(columns, row)}
                 data.append(row_data)
@@ -385,6 +400,7 @@ def ats_per_view(request, matricule, date, nbrmois):
                 'total_sum': total_sum,
                 'average_sum': average_sum,
                 'nbrmois':nbrmois,
+                'agent':agent,
 
             }
 

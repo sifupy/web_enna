@@ -5,14 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ATS Results</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        @media print {
+            @page {
+                size: portrait;
+            }
+            #printButton {
+          display: none;
+        }
+            .rotate-for-print {
+                transform: rotate(90deg);
+            }
+        }
+        .responsive-table {
+            overflow-x: visible;
+        }
+    </style>
+    <script type="text/javascript">
+        function printDocument() {
+            var printElement = document.getElementById('document');
+            var originalContents = document.body.innerHTML;
+
+            // Add a class to rotate the element for printing
+            printElement.classList.add('rotate-for-print');
+
+            // Replace the body with the element to print
+            document.body.innerHTML = printElement.outerHTML;
+
+            // Print the page
+            window.print();
+
+            // Restore the original contents
+            document.body.innerHTML = originalContents;
+
+            // Remove the class from the element
+            printElement.classList.remove('rotate-for-print');
+        }
+    </script>
 </head>
 <body class="bg-gray-100 text-gray-900">
-    <div class="container mx-auto py-8">
-        <h1 class="text-2xl font-bold mb-6">ATS employe pour {{nbrmois}} mois</h1>
+    <div class="container mx-auto py-8" id="document">
+        <h1 class="text-2xl font-bold mb-6">ATS employé de {{nbrmois}} mois</h1>
+        <h2 class="text-xl font-bold mb-6">pour{% if agent.sex == "M" %}Mr{% else %} Mme {% endif %} {{agent.nom}} {{agent.prenom}}</h2>
+
         {% load custom_filters %}
         {% if results %}
-            <div class="overflow-x-auto">
-                <table class="min-w-full bg-white shadow-md rounded">
+            <div class="responsive-table" >
+                <table class="min-w-full bg-white  rounded">
                     
                     <tbody>
                         {% for row in results %}
@@ -43,6 +82,7 @@
         {% else %}
             <p class="text-red-500">No results found.</p>
         {% endif %}
+        <button id="printButton" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded" onclick="printDocument()">Print</button>
     </div>
 </body>
 </html>

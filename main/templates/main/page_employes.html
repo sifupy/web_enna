@@ -3,7 +3,7 @@
 {% block content %}
     <h2 class="text-blue-950 text-xl font-bold">Employee List:</h2>
     <!-- Search Form -->
-    <div class="border h-3/5 p-2 max-h-96">
+    <div class="border  p-2 h-[500px]">
         <form method="GET" action="">
             <label class="relative inline-block mx-5 w-64">
                 <span class="sr-only">Search</span>
@@ -20,11 +20,11 @@
                     value="{{ search_query }}"
                 />
             </label>
-            <button type="submit" class="w-20 h-8 bg-blue-800 rounded-lg text-white font-semibold">Search</button>
+            <button type="submit" class="px-4 h-8 bg-blue-800 rounded-lg text-white font-semibold">rechercher</button>
         </form>
 
         <!-- Employees Table -->
-        <div class="max-h-[300px] overflow-auto">
+        <div class="max-h-[400px] overflow-auto">
             <table class="table-fixed w-full">
                 <thead class="text-gray-500 sticky top-0 bg-white">
                     <tr>
@@ -65,7 +65,7 @@
         <!-- Pagination Controls -->
         <div class="pagination-controls mt-4 text-center">
             {% if page.has_previous %}
-            <a class="px-2" href="?page={{ page.previous_page_number }}&search={{ search_query }}">Previous</a>
+            <a class="px-2" href="?page={{ page.previous_page_number }}&search={{ search_query }}">Prec</a>
             {% endif %}
 
             {% for page_num in page_range %}
@@ -73,7 +73,7 @@
             {% endfor %}
 
             {% if page.has_next %}
-            <a class="px-2" href="?page={{ page.next_page_number }}&search={{ search_query }}">Next</a>
+            <a class="px-2" href="?page={{ page.next_page_number }}&search={{ search_query }}">Siuv</a>
             {% endif %}
         </div>
     </div>

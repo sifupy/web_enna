@@ -13,7 +13,7 @@
             </form>
         </div>
         <div class="card min-h-80 max-h-96  border shadow-sm rounded-lg bg-white text-black p-4">
-            <h1 class="text-xl font-bold">Attestation employé</h1>
+            <h1 class="text-xl font-bold">Attestation de Travail</h1>
             <form method="post" class="flex flex-col justify-between  h-[91%]">
                 {% csrf_token %}
                 {{ form_attes.as_p }}
@@ -21,7 +21,7 @@
             </form>
         </div>
         <div class="card min-h-80 max-h-96  shadow-sm border rounded-lg bg-white text-black p-4 ">
-            <h1 class="text-xl font-bold">document ats</h1>
+            <h1 class="text-xl font-bold">Attestation de Salaire</h1>
             <form method="post" class="flex flex-col justify-center">
                 {% csrf_token %}
                 {{ form_ats.as_p }}

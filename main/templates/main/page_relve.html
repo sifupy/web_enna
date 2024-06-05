@@ -1,4 +1,5 @@
-{% load static tailwind_tags %} {% load static %}
+{% load static tailwind_tags %}
+{% load static %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -10,7 +11,23 @@
       rel="stylesheet"
     />
     {% tailwind_css %}
-    <title>ATS View</title>
+    <style>
+      @media print {
+        .print-btn {
+          display: none;
+        }
+        @page {
+          size: A4;
+          margin: 20mm;
+        }
+        body {
+          width: 210mm;
+          height: 297mm;
+          margin: auto;
+        }
+      }
+    </style>
+    <title>relevé emo </title>
   </head>
   <body class="w-screen h-screen">
     <div class="h-screen pl-10 ">
@@ -58,10 +75,10 @@
         <p>1 AVENUE DE L'INDEPENDENCE, ALGER</p>
         <p>représenté par le Directeur Juridique et des Ressources Humaines</p>
         <p>
-          Attest par la présente que {% if agent.sex == "M" %} Mr {% else %} Mme
-          {%endif%} {{agent.nom}} {{agent.prenom}}
+          Attest par la présente que {% if agent.sex == "M" %} Mr {% else %} Mme {%endif%} {{agent.nom}} {{agent.prenom}}
         </p>
-        <p>a perçu en sa qualité de {{ agent.codepw.despos}}</p>
+        <p>a perçu en sa qualité de {{ post.despos}}</p>
+        <p>Les emoluments suivants pour la période du {{date_d | date:"d-m-Y"}} au {{date_f | date:"d-m-Y"}}</p>
       </div>
       <table border="1" class="w-[400px]">
         <tbody>
@@ -73,7 +90,8 @@
           {% endfor %}
         </tbody>
       </table>
-      <button class="print-btn" onclick="window.print()">Print</button>
+      <p>Le presents relevé des emoluments lui est délivré pour servir et valoir de ce que droit</p>
+      <button class="print-btn bg-blue-800 px-4 h-8 rounded-lg text-white font-semibold" onclick="window.print()">Imprimer</button>
     </div>
   </body>
 </html>
