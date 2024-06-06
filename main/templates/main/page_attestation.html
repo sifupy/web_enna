@@ -19,6 +19,7 @@
             margin: 0 auto;
         }
         .header {
+            position: relative;
             text-align: center;
             margin-bottom: 20px;
         }
@@ -31,13 +32,19 @@
             font-size: 18px;
             margin-bottom: 20px;
         }
+        .code {
+            position: absolute;
+            right: 0;
+            top: 0;
+            font-size: 16px;
+        }
         .content {
             font-size: 18px;
             line-height: 1.8;
             text-align: justify;
         }
-        .content p{
-            margin-left:20% ;
+        .content p {
+            margin-left: 20%;
         }
         .footer {
             max-width: 800px;
@@ -49,15 +56,14 @@
         .stamp {
             display: block;
             margin: 0 auto;
-            margin-top: 30px; /* Ajuster si nécessaire */
-            width: 150px; /* Ajuster la largeur */
-            height: auto; /* Maintenir le rapport hauteur/largeur */
+            margin-top: 30px;
+            width: 150px; 
+            height: auto; 
         }
         .print-btn {
             display: block;
             margin: 20px auto;
             padding: 10px 20px;
-            background-color: #007bff;
             color: #fff;
             border: none;
             border-radius: 5px;
@@ -68,29 +74,27 @@
 <body class="h-screen">
     <div class="container" id="document">
         <div class="header">
+            <div class="code">{{ code }}</div>
             <h1 class="title">ATTESTATION DE TRAVAIL</h1>
-            <h2 class="subtitle">Certification de l'Emploi chez L'ENNA </h2>
+            <h2 class="subtitle">Certification de l'Emploi chez L'ENNA</h2>
             <br>
         </div>
-        <div class="content flex flex-col w-full ">
-            <p >Je soussigné, Le Directeur Juridique et des Ressources Humaines </p>
-            <p >atteste que {% if agent.sex == "M" %}Monsieur{% else %} Madame {% endif %} {{agent.nom}} {{agent.prenom}} née le {{agent.date_de_naissance | date:"d-m-Y"}} </p>
-            <p > est {% if agent.sex == "M" %}employé{% else %} employée {% endif %} par L'ENNA à titre Permanent depuis le {{agent.dateemb| date:"d-m-Y"}}</p>
-            <p >et occupe actuellement le poste de : <p>
+        <div class="content flex flex-col w-full">
+            <p>Je soussigné, Le Directeur Juridique et des Ressources Humaines</p>
+            <p>atteste que {% if agent.sex == "M" %}Monsieur{% else %}Madame{% endif %} {{ agent.nom }} {{ agent.prenom }} née le {{ agent.date_de_naissance | date:"d-m-Y" }}</p>
+            <p>est {% if agent.sex == "M" %}employé{% else %}employée{% endif %} par L'ENNA à titre Permanent depuis le {{ agent.dateemb | date:"d-m-Y" }}</p>
+            <p>et occupe actuellement le poste de :</p>
             <br>
-            <p class="text-gray-950 font-semibold text-center text-xl">{{post.despos}}.</p>
+            <p class="text-gray-950 font-semibold text-center text-xl">{{ post.despos }}.</p>
             <br>
-            <p >Cette attestation lui est délivrée pour servir et valoir ce que de droit.</p>
-            
+            <p>Cette attestation lui est délivrée pour servir et valoir ce que de droit.</p>
         </div>
-        <!-- hna ndirou cachet tae admin par exemple  -->
         <div class="footer">
-            <u class="font-semibold text-black underline decoration-solid  block">Le Directeur Juridique </u> 
-            <u class="font-semibold text-black underline decoration-solid  ">et des Ressources Humaines</u>
+            <u class="font-semibold text-black underline decoration-solid block">Le Directeur Juridique</u>
+            <u class="font-semibold text-black underline decoration-solid">et des Ressources Humaines</u>
         </div>
-        
     </div>
-    <button id="printBtn" class="print-btn " onclick="printDocument()">Print</button>
+    <button id="printBtn" class="print-btn bg-blue-800 p-4" onclick="printDocument()">Imprimer</button>
 
     <script type="text/javascript">
         function printDocument() {
@@ -101,6 +105,5 @@
             document.body.innerHTML = originalContents;
         }
     </script>
-
 </body>
 </html>

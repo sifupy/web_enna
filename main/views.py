@@ -238,18 +238,42 @@ def group_histories(histories):
     
     return grouped_hist
 
-def attestation_view(request,matricule):
-    if not 'user_id' in request.session:
+from django.shortcuts import render, get_object_or_404, HttpResponseRedirect
+from django.urls import reverse
+import random
+from datetime import datetime  # Assurez-vous d'importer datetime correctement
+
+def generer_code_attestation():
+    maintenant = datetime.now()  # Utilisez datetime.now() correctement
+    annee = maintenant.strftime("%y")
+    mois = maintenant.strftime("%m")
+    
+    # Générer une chaîne aléatoire de 4 chiffres
+    random_part = ''.join([str(random.randint(0, 9)) for _ in range(4)])
+    
+    code = f"ATT-{annee}{mois}-{random_part}"
+    return code
+
+def attestation_view(request, matricule):
+    if 'user_id' not in request.session:
         return HttpResponseRedirect(reverse('login'))
-    user=Utilisateur.objects.get(matricule=request.session['user_id'])
-    agent=Agent.objects.get(matricule=matricule)
-    post=Postew.objects.get(codepos=agent.codepw)
-    context={
-        'user':user,
-        'agent':agent,
-        'post':post
+    
+    user = Utilisateur.objects.get(matricule=request.session['user_id'])
+    agent = Agent.objects.get(matricule=matricule)
+    post = Postew.objects.get(codepos=agent.codepw)
+    
+    code = generer_code_attestation()
+    
+    context = {
+        'user': user,
+        'agent': agent,
+        'post': post,
+        'code': code  # Passer le code généré au contexte
     }
-    return render(request,'main/page_attestation.html',context=context)
+    
+    return render(request, 'main/page_attestation.html', context=context)
+
+
 from django.db import connection
 from django.http import JsonResponse
 
